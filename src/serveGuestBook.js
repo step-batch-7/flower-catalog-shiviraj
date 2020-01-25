@@ -1,24 +1,33 @@
 const fs = require('fs');
 const Response = require('./response');
 
+const decodeComment = function(comment) {
+  comment.time = new Date();
+  comment.name = comment.name.replace(/\+/g, ' ');
+  comment.comment = comment.comment.replace(/\+/g, ' ');
+  comment.comment = comment.comment.replace(/%0D%0A/g, '\n');
+  return comment;
+};
+
 const updateComment = function(request) {
   const commentDir = `${__dirname}/../database/comments.json`;
   let allComments = fs.readFileSync(commentDir, 'utf8');
   allComments = JSON.parse(allComments);
   if (request.method === 'POST') {
-    const comment = request.body;
-    comment.time = new Date();
-    allComments.push(request.body);
+    const newComment = decodeComment(request.body);
+    allComments.push(newComment);
     fs.writeFile(commentDir, JSON.stringify(allComments, null, 2), () => {});
   }
   return allComments;
 };
 
 const getCommentsInHtml = function(allComments) {
+  allComments = allComments.reverse();
   return allComments.reduce((htmlContent, comment) => {
+    comment.comment = comment.comment.replace(/(\n)/g, '<br />');
     htmlContent += `<div class="comment">
     <div class="name">${comment.name}</div>
-      <div class="time">${comment.time}</div>
+      <div class="time">Commented On: &nbsp; ${comment.time}</div>
       <div class="msg">${comment.comment}</div>
     </div>`;
     return htmlContent;

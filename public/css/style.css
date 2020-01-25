@@ -32,7 +32,7 @@ a {
 .hide {
   visibility: hidden;
 }
-.name {
+.inputField {
   height: 20px;
   border: 1px solid #888;
 }
@@ -42,4 +42,19 @@ a {
   padding: 4px 16px;
   background-color: #ddd;
   border-radius: 4px;
+}
+.comment {
+  margin: 10px;
+}
+.name {
+  font-weight: 700;
+  font-size: 24px;
+}
+.time {
+  padding-left: 24px;
+}
+.msg {
+  padding: 8px;
+  padding-left: 24px;
+  background-color: #ddd;
 }
