@@ -1,7 +1,18 @@
-body {
-  font-family: sans-serif;
-}
 .title-bar {
   text-align: right;
   color: #f3a718;
+  padding-right: 10%;
+}
+a {
+  font-weight: 600;
+}
+.main-content {
+  display: flex;
+  justify-content: left;
+}
+.right-sidebar {
+  margin: auto 0;
+}
+.right-sidebar > img {
+  padding-left: 64px;
 }
