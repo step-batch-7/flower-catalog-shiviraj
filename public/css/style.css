@@ -23,5 +23,8 @@ a {
   margin: auto 8px;
 }
 .right-sidebar > img {
-  padding-left: 96px;
+  padding-left: 80px;
+}
+.hide {
+  visibility: hidden;
 }
