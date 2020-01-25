@@ -1,44 +1,24 @@
 const fs = require('fs');
 const Response = require('./response');
+const COMMENT_DIR = `${__dirname}/../database/comments.json`;
+const TEMPLATE_DIR = `${__dirname}/../templates`;
 
-const decodeComment = function(comment) {
-  comment.time = new Date();
-  comment.name = comment.name.replace(/\+/g, ' ');
-  comment.comment = comment.comment.replace(/\+/g, ' ');
-  comment.comment = comment.comment.replace(/%0D%0A/g, '\n');
-  return comment;
-};
-
-const updateComment = function(request) {
-  const commentDir = `${__dirname}/../database/comments.json`;
-  let allComments = fs.readFileSync(commentDir, 'utf8');
-  allComments = JSON.parse(allComments);
-  if (request.method === 'POST') {
-    const newComment = decodeComment(request.body);
-    allComments.push(newComment);
-    fs.writeFile(commentDir, JSON.stringify(allComments, null, 2), () => {});
-  }
-  return allComments;
-};
-
-const getCommentsInHtml = function(allComments) {
-  allComments = allComments.reverse();
+const getNewerCommentsInHTML = function(allComments) {
   return allComments.reduce((htmlContent, comment) => {
-    comment.comment = comment.comment.replace(/(\n)/g, '<br />');
+    const msg = comment.msg.replace(/(\n)/g, '<br />');
     htmlContent += `<div class="comment">
     <div class="name">${comment.name}</div>
       <div class="time">Commented On: &nbsp; ${comment.time}</div>
-      <div class="msg">${comment.comment}</div>
+      <div class="msg">${msg}</div>
     </div>`;
     return htmlContent;
   }, '');
 };
 
 const sendResponse = function(request, allComments, callback) {
-  const commentsInHtml = getCommentsInHtml(allComments);
+  const commentsInHtml = getNewerCommentsInHTML(allComments);
   const response = new Response();
-  const filePath = `${__dirname}/../templates${request.url}`;
-  fs.readFile(filePath, 'utf8', (err, data) => {
+  fs.readFile(`${TEMPLATE_DIR}${request.url}`, 'utf8', (err, data) => {
     if (!err) {
       data = data.replace(/__comments__/g, commentsInHtml);
       response.setHeader('Content-Type', 'text/html');
@@ -50,9 +30,26 @@ const sendResponse = function(request, allComments, callback) {
   });
 };
 
+const getExistingComments = function() {
+  const allComments = fs.readFileSync(COMMENT_DIR, 'utf8');
+  return JSON.parse(allComments);
+};
+
+const updateComment = function(allComments, newComment) {
+  newComment.time = new Date();
+  allComments.unshift(newComment);
+  fs.writeFile(COMMENT_DIR, JSON.stringify(allComments, null, 2), () => {});
+};
+
 const serveGuestBook = function(request, callback) {
-  const allComments = updateComment(request);
+  const allComments = getExistingComments();
   sendResponse(request, allComments, callback);
 };
 
-module.exports = {serveGuestBook};
+const serveGuestBookPost = function(request, callback) {
+  const allComments = getExistingComments();
+  updateComment(allComments, request.body);
+  sendResponse(request, allComments, callback);
+};
+
+module.exports = {serveGuestBook, serveGuestBookPost};

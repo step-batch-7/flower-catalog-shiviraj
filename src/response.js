@@ -1,8 +1,10 @@
+const ERROR_PAGE = `<html><body><center><h1>404 Error</h1><p>Page Not Found</p></center></body></html>`;
+
 class Response {
   constructor() {
     this.statusCode = 404;
-    this.headers = [{key: 'Content-Length', value: 0}];
-    this.body = '';
+    this.body = ERROR_PAGE;
+    this.headers = [{key: 'Content-Length', value: this.body.length}];
   }
   setHeader(key, value) {
     let header = this.headers.find(h => h.key === key);

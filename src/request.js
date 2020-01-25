@@ -1,6 +1,11 @@
+const decodeValue = function(value) {
+  value = value.replace(/\+/g, ' ');
+  return value.replace(/%0D%0A/g, '\n');
+};
+
 const pickupParams = function(query, keyValue) {
   const [key, value] = keyValue.split('=');
-  query[key] = value;
+  query[key] = decodeValue(value);
   return query;
 };
 
@@ -46,7 +51,9 @@ class Request {
     if (header['Content-Type'] === 'application/x-www-form-urlencoded') {
       body = readParams(body);
     }
-    return new Request(method, url, query, header, body);
+    const req = new Request(method, url, query, header, body);
+    console.log(req);
+    return req;
   }
 }
 
