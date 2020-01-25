@@ -16,6 +16,9 @@ write other file
 
 write guestbook
   first make with Static
+  
+--DONE--
+
   write server
   take input and store in database
   show database 
