@@ -1,3 +1,7 @@
+body {
+  max-width: 1200px;
+  margin: 0 auto;
+}
 .title-bar {
   color: #f3a718;
   padding-right: 10%;
@@ -27,4 +31,15 @@ a {
 }
 .hide {
   visibility: hidden;
+}
+.name {
+  height: 20px;
+  border: 1px solid #888;
+}
+#submit {
+  font-size: 16px;
+  border: 1px solid #888;
+  padding: 4px 16px;
+  background-color: #ddd;
+  border-radius: 4px;
 }

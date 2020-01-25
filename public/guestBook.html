@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <title>Guest Book</title>
+  </head>
+  <body>
+    <h1 class="title-bar center">
+      <a href="./index.html">&lt;&lt;</a> Guest Book
+    </h1>
+    <hr />
+    <form method="post">
+      <h1>Leave a Comment</h1>
+      <label>Name:</label>
+      <input type="text" name="name" class="name" /><br /><br />
+      <label>Comment:</label>
+      <textarea name="comment" cols="30" rows="4"></textarea><br />
+      <input type="submit" value="Submit" id="submit" />
+    </form>
+    <hr />
+    <div id="all-comment"></div>
+  </body>
+</html>
