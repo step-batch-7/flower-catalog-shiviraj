@@ -1,0 +1,21 @@
+TODO
+---------
+Make Static WebApp
+  make public directory
+  make css and images directory inside public
+  make index.html
+  
+
+index.html
+  write all content of html
+  style of index page
+
+write other file
+  ageratum.html
+  abeliophyllum.html
+
+write guestbook
+  first make with Static
+  write server
+  take input and store in database
+  show database 
