@@ -1,7 +1,9 @@
 const Request = require('./src/request');
 const {servePage} = require('./src/servePage');
+const {serveGuestBook} = require('./src/serveGuestBook');
 
 const findHandler = function(req) {
+  if (req.url === '/guestBook.html') return serveGuestBook;
   if (req.method === 'GET') return servePage;
 };
 
