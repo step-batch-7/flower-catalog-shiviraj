@@ -51,9 +51,7 @@ class Request {
     if (header['Content-Type'] === 'application/x-www-form-urlencoded') {
       body = readParams(body);
     }
-    const req = new Request(method, url, query, header, body);
-    console.log(req);
-    return req;
+    return new Request(method, url, query, header, body);
   }
 }
 
