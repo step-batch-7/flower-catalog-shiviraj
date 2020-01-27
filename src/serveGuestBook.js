@@ -3,7 +3,7 @@ const Response = require('./response');
 const COMMENT_DIR = `${__dirname}/../database/comments.json`;
 const TEMPLATE_DIR = `${__dirname}/../templates`;
 
-const getNewerCommentsInHTML = function(allComments) {
+const getCommentsInHTML = function(allComments) {
   return allComments.reduce((htmlContent, comment) => {
     const msg = comment.msg.replace(/(\n)/g, '<br />');
     htmlContent += `<div class="comment">
@@ -16,7 +16,7 @@ const getNewerCommentsInHTML = function(allComments) {
 };
 
 const sendResponse = function(request, allComments, callback) {
-  const commentsInHtml = getNewerCommentsInHTML(allComments);
+  const commentsInHtml = getCommentsInHTML(allComments);
   const response = new Response();
   fs.readFile(`${TEMPLATE_DIR}${request.url}`, 'utf8', (err, data) => {
     if (!err) {

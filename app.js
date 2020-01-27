@@ -7,7 +7,7 @@ const findHandler = function(req) {
     return serveGuestBookPost;
   if (req.method === 'GET' && req.url === '/guestBook.html')
     return serveGuestBook;
-  if (req.method === 'GET') return servePage;
+  return servePage;
 };
 
 const handleData = function(text, socket) {
