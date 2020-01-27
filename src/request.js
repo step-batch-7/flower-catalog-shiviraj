@@ -1,6 +1,6 @@
 const decodeValue = function(value) {
   value = value.replace(/\+/g, ' ');
-  return value.replace(/%0D%0A/g, '\n');
+  return decodeURIComponent(value);
 };
 
 const pickupParams = function(query, keyValue) {

@@ -1,4 +1,4 @@
-const ERROR_PAGE = `<html><body><center><h1>404 Error</h1><p>Page Not Found</p></center></body></html>`;
+const ERROR_PAGE = '<html><body><center><h1>404 Error</h1><p>Page Not Found</p></center></body></html>';
 
 class Response {
   constructor() {
