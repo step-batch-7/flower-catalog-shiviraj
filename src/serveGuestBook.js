@@ -1,5 +1,5 @@
 const fs = require('fs');
-const Response = require('./response');
+const {parseText} = require('./parseComment');
 const COMMENT_DIR = `${__dirname}/../database/comments.json`;
 const TEMPLATE_DIR = `${__dirname}/../templates`;
 
@@ -15,18 +15,12 @@ const getCommentsInHTML = function(allComments) {
   }, '');
 };
 
-const sendResponse = function(request, allComments, callback) {
+const sendResponse = function(request, allComments, response) {
   const commentsInHtml = getCommentsInHTML(allComments);
-  const response = new Response();
   fs.readFile(`${TEMPLATE_DIR}${request.url}`, 'utf8', (err, data) => {
-    if (!err) {
-      data = data.replace(/__comments__/g, commentsInHtml);
-      response.setHeader('Content-Type', 'text/html');
-      response.setHeader('Content-Length', data.length);
-      response.statusCode = 200;
-      response.body = data;
-    }
-    callback(response);
+    data = data.replace(/__comments__/g, commentsInHtml);
+    response.setHeader('Content-Type', 'text/html');
+    response.end(data);
   });
 };
 
@@ -41,15 +35,20 @@ const updateComment = function(allComments, newComment) {
   fs.writeFile(COMMENT_DIR, JSON.stringify(allComments, null, 2), () => {});
 };
 
-const serveGuestBook = function(request, callback) {
+const serveGuestBook = function(request, response) {
   const allComments = getExistingComments();
-  sendResponse(request, allComments, callback);
+  sendResponse(request, allComments, response);
 };
 
-const serveGuestBookPost = function(request, callback) {
+const serveGuestBookPost = function(request, response) {
+  let data = '';
+  request.on('data', chunk => (data += chunk));
+  request.on('end', () => {
+    const newComment = parseText(data);
+    updateComment(allComments, newComment);
+    sendResponse(request, allComments, response);
+  });
   const allComments = getExistingComments();
-  updateComment(allComments, request.body);
-  sendResponse(request, allComments, callback);
 };
 
 module.exports = {serveGuestBook, serveGuestBookPost};

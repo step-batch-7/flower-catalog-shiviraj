@@ -1,5 +1,5 @@
 const fs = require('fs');
-const Response = require('./response');
+const ERROR_HTML = `<html><body><center><h1>404 Not Found</h1></center></body></html>`;
 
 const CONTENT_TYPE = {
   html: 'text/html',
@@ -22,17 +22,18 @@ const getContentTypeAndFilePath = function(url) {
   return [path, contentType];
 };
 
-const servePage = function(request, callback) {
-  const response = new Response();
-  const [filePath, contentType] = getContentTypeAndFilePath(request.url);
+const servePage = function(request, response) {
+  let [filePath, contentType] = getContentTypeAndFilePath(request.url);
   fs.readFile(filePath, (err, data) => {
-    if (!err) {
-      response.setHeader('Content-Type', contentType);
-      response.setHeader('Content-Length', data.length);
-      response.statusCode = 200;
-      response.body = data;
+    let statusCode = 200;
+    if (err) {
+      statusCode = 404;
+      contentType = 'text/html';
+      data = ERROR_HTML;
     }
-    callback(response);
+    response.setHeader('Content-Type', contentType);
+    response.writeHeader(statusCode);
+    response.end(data);
   });
 };
 
