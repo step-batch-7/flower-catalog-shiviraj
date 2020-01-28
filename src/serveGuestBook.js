@@ -1,5 +1,6 @@
 const fs = require('fs');
-const {parseText} = require('./parseComment');
+const querystring = require('querystring');
+
 const COMMENT_DIR = `${__dirname}/../database/comments.json`;
 const TEMPLATE_DIR = `${__dirname}/../templates`;
 
@@ -44,7 +45,7 @@ const serveGuestBookPost = function(request, response) {
   let data = '';
   request.on('data', chunk => (data += chunk));
   request.on('end', () => {
-    const newComment = parseText(data);
+    const newComment = querystring.parse(data);
     updateComment(allComments, newComment);
     sendResponse(request, allComments, response);
   });
