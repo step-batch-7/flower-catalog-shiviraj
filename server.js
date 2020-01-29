@@ -1,10 +1,10 @@
 const http = require('http');
 const {servePage} = require('./src/servePage');
-const {serveGuestBook, serveGuestBookPost} = require('./src/serveGuestBook');
+const {serveGuestBook, updateGuestComment} = require('./src/serveGuestBook');
 
 const findHandler = function(req) {
   if (req.method === 'POST' && req.url === '/guestBook.html')
-    return serveGuestBookPost;
+    return updateGuestComment;
   if (req.method === 'GET' && req.url === '/guestBook.html')
     return serveGuestBook;
   return servePage;
