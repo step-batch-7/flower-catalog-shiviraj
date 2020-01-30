@@ -1,7 +1,6 @@
 const fs = require('fs');
-const ERROR_HTML = `<html><body><center><h1>404 Not Found</h1></center></body></html>`;
 
-const CONTENT_TYPE = {
+const MIME_TYPES = {
   html: 'text/html',
   css: 'text/css',
   jpg: 'image/jpg',
@@ -10,31 +9,21 @@ const CONTENT_TYPE = {
   pdf: 'application/pdf'
 };
 
-const getContentType = function(path) {
-  const [, extension] = path.match(/.*\.(.*)$/) || [];
-  return CONTENT_TYPE[extension];
+const getAbsolutePath = function(url) {
+  const path = url === '/' ? '/index.html' : url;
+  return `${__dirname}/../public${path}`;
 };
 
-const getContentTypeAndFilePath = function(url) {
-  if (url === '/') url = '/index.html';
-  const path = `${__dirname}/../public${url}`;
-  const contentType = getContentType(url);
-  return [path, contentType];
-};
-
-const servePage = function(request, response) {
-  let [filePath, contentType] = getContentTypeAndFilePath(request.url);
-  fs.readFile(filePath, (err, data) => {
-    let statusCode = 200;
-    if (err) {
-      statusCode = 404;
-      contentType = 'text/html';
-      data = ERROR_HTML;
+const serveStaticPage = function(req, res, next) {
+  const absolutePath = getAbsolutePath(req.url);
+  fs.readFile(absolutePath, (err, data) => {
+    if (!err) {
+      const extension = absolutePath.split('.').pop();
+      res.setHeader('Content-Type', MIME_TYPES[extension]);
+      res.end(data);
     }
-    response.setHeader('Content-Type', contentType);
-    response.writeHeader(statusCode);
-    response.end(data);
+    next();
   });
 };
 
-module.exports = {servePage};
+module.exports = {serveStaticPage};

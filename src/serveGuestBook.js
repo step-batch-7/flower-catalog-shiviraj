@@ -1,18 +1,19 @@
 const fs = require('fs');
-const querystring = require('querystring');
 
+const STATUS_OK = 200;
+const STATUS_MOVED = 301;
 const COMMENT_DIR = `${__dirname}/../database/comments.json`;
 const TEMPLATE_DIR = `${__dirname}/../templates`;
 
 const getCommentsInHTML = function(allComments) {
   return allComments.reduce((htmlContent, comment) => {
     const msg = comment.msg.replace(/(\n)/g, '<br />');
-    htmlContent += `<div class="comment">
+    const htmlComment = `<div class="comment">
     <div class="name">${comment.name}</div>
       <div class="time">Commented On: &nbsp; ${comment.time}</div>
       <div class="msg">${msg}</div>
     </div>`;
-    return htmlContent;
+    return htmlContent + htmlComment;
   }, '');
 };
 
@@ -21,33 +22,34 @@ const getExistingComments = function() {
   return JSON.parse(allComments);
 };
 
-const serveGuestBook = function(request, response) {
+const serveGuestBook = function(req, res, next) {
   const allComments = getExistingComments();
   const commentsInHtml = getCommentsInHTML(allComments);
-  fs.readFile(`${TEMPLATE_DIR}${request.url}`, 'utf8', (err, data) => {
-    data = data.replace(/__comments__/g, commentsInHtml);
-    response.setHeader('Content-Type', 'text/html');
-    response.end(data);
+  fs.readFile(`${TEMPLATE_DIR}${req.url}`, 'utf8', (err, data) => {
+    if (!err) {
+      const htmlContent = data.replace(/__comments__/g, commentsInHtml);
+      res.setHeader('Content-Type', 'text/html');
+      res.writeHead(STATUS_OK);
+      res.write(htmlContent);
+      res.end();
+    }
+    next();
   });
 };
 
-const updateComment = function(data) {
-  const newComment = querystring.parse(data);
+const updateComment = function(newComment) {
   newComment.time = new Date();
   const allComments = getExistingComments();
   allComments.unshift(newComment);
-  fs.writeFile(COMMENT_DIR, JSON.stringify(allComments, null, 2), () => {});
+  fs.writeFile(COMMENT_DIR, JSON.stringify(allComments), () => {});
 };
 
-const updateGuestComment = function(request, response) {
-  let data = '';
-  request.on('data', chunk => (data += chunk));
-  request.on('end', () => {
-    updateComment(data);
-    response.setHeader('Location', '/guestBook.html');
-    response.writeHead(301);
-    response.end();
-  });
+const updateGuestComment = function(req, response, next) {
+  updateComment(req.body);
+  response.setHeader('Location', '/guestBook.html');
+  response.writeHead(STATUS_MOVED);
+  response.end();
+  next();
 };
 
 module.exports = {serveGuestBook, updateGuestComment};

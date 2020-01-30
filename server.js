@@ -1,25 +1,39 @@
 const http = require('http');
-const {servePage} = require('./src/servePage');
+const querystring = require('querystring');
+
+const PORT = 3000;
+
+const {App} = require('./app');
+const {serveStaticPage} = require('./src/servePage');
+const {notFound, methodNotAllowed} = require('./src/serveError');
 const {serveGuestBook, updateGuestComment} = require('./src/serveGuestBook');
 
-const findHandler = function(req) {
-  if (req.method === 'POST' && req.url === '/guestBook.html')
-    return updateGuestComment;
-  if (req.method === 'GET' && req.url === '/guestBook.html')
-    return serveGuestBook;
-  return servePage;
+const readBody = function(req, res, next) {
+  let data = '';
+  req.on('data', chunk => {
+    data += chunk;
+  });
+  req.on('end', () => {
+    req.body = querystring.parse(data);
+    next();
+  });
 };
 
-const handleData = function(request, response) {
-  const handler = findHandler(request);
-  handler(request, response);
+const addHandlers = function(app) {
+  app.use(readBody);
+  app.get('', serveStaticPage);
+  app.get('/guestBook.html', serveGuestBook);
+  app.post('/updateComment', updateGuestComment);
+  app.get('.*', notFound);
+  app.post('.*', notFound);
+  app.use(methodNotAllowed);
 };
 
 const main = function() {
-  const server = http.createServer(handleData);
-  server.on('close', () => console.log('Server Closed'));
-  server.on('end', () => console.log('Server Ended'));
-  server.listen(3000, () => console.log('server is on'));
+  const app = new App();
+  addHandlers(app);
+  const server = http.createServer(app.serve.bind(app));
+  server.listen(PORT, () => process.stdout.write('server is on'));
 };
 
 main();
