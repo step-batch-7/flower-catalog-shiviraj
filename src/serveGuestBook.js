@@ -26,14 +26,15 @@ const serveGuestBook = function(req, res, next) {
   const allComments = getExistingComments();
   const commentsInHtml = getCommentsInHTML(allComments);
   fs.readFile(`${TEMPLATE_DIR}${req.url}`, 'utf8', (err, data) => {
-    if (!err) {
-      const htmlContent = data.replace(/__comments__/g, commentsInHtml);
-      res.setHeader('Content-Type', 'text/html');
-      res.writeHead(STATUS_OK);
-      res.write(htmlContent);
-      res.end();
+    if (err) {
+      next();
+      return;
     }
-    next();
+    const htmlContent = data.replace(/__comments__/g, commentsInHtml);
+    res.setHeader('Content-Type', 'text/html');
+    res.writeHead(STATUS_OK);
+    res.write(htmlContent);
+    res.end();
   });
 };
 
@@ -44,12 +45,11 @@ const updateComment = function(newComment) {
   fs.writeFile(COMMENT_DIR, JSON.stringify(allComments), () => {});
 };
 
-const updateGuestComment = function(req, response, next) {
+const updateGuestComment = function(req, response) {
   updateComment(req.body);
   response.setHeader('Location', '/guestBook.html');
   response.writeHead(STATUS_MOVED);
   response.end();
-  next();
 };
 
 module.exports = {serveGuestBook, updateGuestComment};

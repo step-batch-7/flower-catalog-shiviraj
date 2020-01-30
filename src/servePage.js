@@ -17,12 +17,13 @@ const getAbsolutePath = function(url) {
 const serveStaticPage = function(req, res, next) {
   const absolutePath = getAbsolutePath(req.url);
   fs.readFile(absolutePath, (err, data) => {
-    if (!err) {
-      const extension = absolutePath.split('.').pop();
-      res.setHeader('Content-Type', MIME_TYPES[extension]);
-      res.end(data);
+    if (err) {
+      next();
+      return;
     }
-    next();
+    const extension = absolutePath.split('.').pop();
+    res.setHeader('Content-Type', MIME_TYPES[extension]);
+    res.end(data);
   });
 };
 
